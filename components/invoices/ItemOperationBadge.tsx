@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
-import { ChevronDown, ShoppingCart, TrendingUp, Receipt } from "lucide-react";
+import { ChevronDown, ShoppingCart, TrendingUp, Percent, PlusCircle } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ItemOperationType } from "@/types/invoice";
 import { OPERATION_TYPE_CONFIG } from "@/constants";
@@ -14,10 +14,11 @@ interface ItemOperationBadgeProps {
 const OPERATION_ICONS: Record<ItemOperationType, typeof ShoppingCart> = {
   sale: TrendingUp,
   purchase: ShoppingCart,
-  expense: Receipt,
+  deduction: Percent,
+  addition: PlusCircle,
 };
 
-const OPERATION_ORDER: ItemOperationType[] = ["sale", "purchase", "expense"];
+const OPERATION_ORDER: ItemOperationType[] = ["sale", "purchase", "deduction", "addition"];
 
 export default function ItemOperationBadge({ value, onChange }: ItemOperationBadgeProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,7 +26,6 @@ export default function ItemOperationBadge({ value, onChange }: ItemOperationBad
   const config = OPERATION_TYPE_CONFIG[value];
   const Icon = OPERATION_ICONS[value];
 
-  // بستن لیست کشویی با کلیک بیرون از آن
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {

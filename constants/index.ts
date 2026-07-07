@@ -11,7 +11,6 @@ export const INVOICE_STATUS_CONFIG = {
   cancelled: { label: "لغو شده", color: "#dc2626", bg: "#fee2e2" },
 } as const;
 
-// تایپ جداگانه برای تنظیمات هر نوع عملیات - جدا کردنش از خود Record باعث میشه parser مشکلی با خواندنش نداشته باشه
 type OperationTypeConfigItem = {
   label: string;
   description: string;
@@ -33,11 +32,17 @@ export const OPERATION_TYPE_CONFIG: Record<ItemOperationType, OperationTypeConfi
     color: "#dc2626",
     bg: "#fee2e2",
   },
-  expense: {
-    label: "هزینه اضافی",
-    description: "مبلغ این قلم از فاکتور نهایی کم می‌شود",
+  deduction: {
+    label: "کسر",
+    description: "مانند مالیات؛ این مبلغ از فاکتور نهایی کسر می‌شود",
     color: "#d97706",
     bg: "#fef3c7",
+  },
+  addition: {
+    label: "اضافه",
+    description: "مانند اجرت کار؛ این مبلغ به فاکتور نهایی اضافه می‌شود",
+    color: "#2563eb",
+    bg: "#dbeafe",
   },
 };
 

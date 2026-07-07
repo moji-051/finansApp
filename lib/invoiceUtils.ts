@@ -1,13 +1,26 @@
 import { InvoiceItem, ItemOperationType } from "@/types/invoice";
 
+// نوع‌هایی که مبلغشون به فاکتور اضافه می‌شه
+const ADDING_TYPES: ItemOperationType[] = ["sale", "addition"];
+
 /**
- * مبلغ یک قلم را با علامت مثبت یا منفی برمی‌گرداند (فروش: مثبت / خرید و هزینه: منفی)
- * نکته: اگر operationType موجود نباشد (فاکتورهای قدیمی)، پیش‌فرض "فروش" در نظر گرفته می‌شود
+ * نوع عملیات یک قلم را برمی‌گرداند و سازگاری با داده‌های قدیمی را تضمین می‌کند
+ * - اگر نوع مشخص نبود (فاکتورهای خیلی قدیمی) → "فروش" در نظر گرفته می‌شود
+ * - اگر نوع قدیمی "expense" بود (نسخه قبلی برنامه) → به "کسر" تبدیل می‌شود، چون هر دو از مبلغ کم می‌کنند
+ */
+export function resolveOperationType(rawType: string | undefined | null): ItemOperationType {
+  if (!rawType) return "sale";
+  if (rawType === "expense") return "deduction"; // سازگاری با نسخه قبلی برنامه
+  return rawType as ItemOperationType;
+}
+
+/**
+ * مبلغ یک قلم را با علامت مثبت یا منفی برمی‌گرداند
  */
 export function getItemSignedAmount(item: InvoiceItem): number {
   const rawAmount = item.quantity * item.unitPrice;
-  const operationType: ItemOperationType = item.operationType ?? "sale";
-  return operationType === "sale" ? rawAmount : -rawAmount;
+  const operationType = resolveOperationType(item.operationType);
+  return ADDING_TYPES.includes(operationType) ? rawAmount : -rawAmount;
 }
 
 /**
@@ -18,11 +31,11 @@ export function calculateInvoiceTotal(items: InvoiceItem[]): number {
 }
 
 /**
- * اطمینان از اینکه اقلام فاکتورهای قدیمی (بدون operationType)، وقتی در فرم باز می‌شوند، مقدار پیش‌فرض "فروش" بگیرند
+ * اطمینان از اینکه اقلام فاکتورهای قدیمی، وقتی در فرم باز می‌شوند، نوع معتبر و به‌روزی داشته باشند
  */
 export function normalizeInvoiceItems(items: InvoiceItem[]): InvoiceItem[] {
   return items.map((item) => ({
     ...item,
-    operationType: item.operationType ?? "sale",
+    operationType: resolveOperationType(item.operationType),
   }));
 }

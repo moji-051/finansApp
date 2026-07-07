@@ -3,7 +3,7 @@
 import { forwardRef, useMemo } from "react";
 import { Invoice } from "@/types/invoice";
 import { formatInvoiceDate } from "@/lib/dateUtils";
-import { calculateInvoiceTotal, getItemSignedAmount } from "@/lib/invoiceUtils";
+import { calculateInvoiceTotal, getItemSignedAmount, resolveOperationType } from "@/lib/invoiceUtils";
 import { INVOICE_STATUS_CONFIG, OPERATION_TYPE_CONFIG } from "@/constants";
 
 interface InvoicePrintTemplateProps {
@@ -93,7 +93,8 @@ const InvoicePrintTemplate = forwardRef<HTMLDivElement, InvoicePrintTemplateProp
             </thead>
             <tbody>
               {invoice.items.map((item) => {
-                const operationType = item.operationType ?? "sale";
+                // resolveOperationType تضمین می‌کنه حتی نوع‌های قدیمی (expense) هم درست نمایش داده بشن
+                const operationType = resolveOperationType(item.operationType);
                 const opConfig = OPERATION_TYPE_CONFIG[operationType];
                 const signedAmount = getItemSignedAmount(item);
 
